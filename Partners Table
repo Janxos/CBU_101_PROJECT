@@ -1,0 +1,184 @@
+#include "PartnersTable.h"
+#include <string>
+#include <iostream>
+#include "SQLAPI.h"
+
+
+
+void PartnersTable::add(std::string partnerId, std::string lastName, std::string firstName, 
+						std::string orgName, std::string phone, std:: string email)
+{
+	SAConnection con;
+	try {
+		// configure SAConnection using the Connect method
+		con.Connect("(local)@Partners","partner","partner",SA_SQLServer_Client);
+
+		std::string tempString = 
+			"INSERT INTO Partners (PartnerID, LastName, FirstName, OrgName, Phone, Email) VALUES ('"
+			+ partnerId + "', '" + lastName + "', '" + firstName + "', '" + orgName + "', '" + 
+			phone + "', '" + email + "')";
+
+		// Setup up the command to send via the connection to the database
+		// The string argument is an SQL select statement against the faculty table
+
+		SACommand cmd(&con, tempString.c_str());  
+
+		// Execute the command
+		cmd.Execute();
+
+		// commit changes on success
+		con.Commit();
+
+		std::cout << "\nSuccessfully added " << firstName << " " << lastName << "." << std::endl;
+	}
+	// Handle any problems here
+	catch(SAException &x)
+	{
+		// SAConnection::Rollback()
+		// can also throw an exception
+		// (if a network error for example),
+		// we will be ready
+		try
+		{
+			// on error rollback changes
+			con.Rollback();
+		}
+		catch(SAException &)
+		{
+		}
+		// print error message
+		printf("%s\n", (const char*)x.ErrText());
+	}
+}
+
+void PartnersTable::remove(std::string partnerId)
+{
+	SAConnection con;
+	try {
+		// configure SAConnection using the Connect method
+		con.Connect("(local)@Partners","partner","partner",SA_SQLServer_Client);
+
+		std::string tempString = "DELETE FROM Partners WHERE PartnerID = '" + partnerId + "'";
+		SACommand cmd(&con, tempString.c_str());  
+
+		// Execute the command
+		cmd.Execute();
+
+		// commit changes on success
+		con.Commit();
+
+		std::cout << "\nSuccessfully removed partner." << std::endl;
+	}
+	// Handle any problems here
+	catch(SAException &x)
+	{
+		// SAConnection::Rollback()
+		// can also throw an exception
+		// (if a network error for example),
+		// we will be ready
+		try
+		{
+			// on error rollback changes
+			con.Rollback();
+		}
+		catch(SAException &)
+		{
+		}
+		// print error message
+		printf("%s\n", (const char*)x.ErrText());
+	}
+}
+
+void PartnersTable::edit(std::string partnerId, std::string newLastName, std::string newFirstName, 
+						 std::string newOrgName, std::string newPhone, std:: string newEmail)
+{
+	SAConnection con;
+	try {
+		// configure SAConnection using the Connect method
+		con.Connect("(local)@Partners","partner","partner",SA_SQLServer_Client);
+
+		std::string tempString = "UPDATE Partners SET LastName = '" + newLastName + "', FirstName = '" 
+									+ newFirstName +  "', OrgName = '" + newOrgName +  "', Phone = '" + 
+								newPhone +  "', Email = '" + newEmail + "' WHERE PartnerID = '" + partnerId + "'";
+		SACommand cmd(&con, tempString.c_str());  
+
+		// Execute the command
+		cmd.Execute();
+
+		// commit changes on success
+		con.Commit();
+
+		std::cout << "\nSuccessfully updated partner information." << std::endl;
+	}
+	// Handle any problems here
+	catch(SAException &x)
+	{
+		// SAConnection::Rollback()
+		// can also throw an exception
+		// (if a network error for example),
+		// we will be ready
+		try
+		{
+			// on error rollback changes
+			con.Rollback();
+		}
+		catch(SAException &)
+		{
+		}
+		// print error message
+		printf("%s\n", (const char*)x.ErrText());
+	}
+}
+
+void PartnersTable::list()
+{
+	SAConnection con;
+	try {
+		// configure SAConnection using the Connect method
+		con.Connect("(local)@Partners","partner","partner",SA_SQLServer_Client);
+
+		// Setup up the command to send via the connection to the database
+		// The string argument is an SQL select statement against the faculty table
+		SACommand cmd(&con,
+			"SELECT PartnerId, LastName, FirstName, OrgName, Phone, Email FROM Partners ORDER BY LastName");  
+
+		// Execute the command
+		cmd.Execute();
+
+		// Iterate through the result set
+		std::cout << "\tID" << "\t\tLast Name" << "\t\tFirst Name"<<"\t\tOrganization"
+			<<"\t\tPhone #"<<"\t\tEmail\n";
+		std::cout << "---------------------------------------------------------------\n";
+		while(cmd.FetchNext())
+		{
+			std::cout << "\t" << cmd.Field("FacultyId").asLong();
+			std::cout << "\t\t" << (const char*)cmd.Field("LastName").asString();
+			std::cout << "\t\t\t" << (const char*)cmd.Field("FirstName").asString();
+			std::cout << "\t\t" << (const char*)cmd.Field("OrgName").asString();
+			std::cout << "\t\t" << (const char*)cmd.Field("Phone").asString();
+			std::cout << "\t\t" << (const char*)cmd.Field("Email").asString()<< std::endl;
+			std::cout << "---------------------------------------------------------------\n";
+		}
+
+		// commit changes on success
+		con.Commit();
+	}
+	// Handle any problems here
+	catch(SAException &x)
+	{
+		// SAConnection::Rollback()
+		// can also throw an exception
+		// (if a network error for example),
+		// we will be ready
+		try
+		{
+			// on error rollback changes
+			con.Rollback();
+		}
+		catch(SAException &)
+		{
+		}
+		// print error message
+		printf("%s\n", (const char*)x.ErrText());
+	}
+}
