@@ -1,0 +1,13 @@
+#pragma once;
+#include <string>
+class PartnersTable
+{
+private:
+
+public:
+	void add(std::string partnerId, std::string lastName, std::string firstName, std::string orgName, std::string phone, std:: string email);
+	void remove(std::string partnerId);
+	void edit(std::string partnerId, std::string newLastName, std::string newFirstName, std::string newOrgName, std::string phone, std:: string email);
+	void list();
+};
+
